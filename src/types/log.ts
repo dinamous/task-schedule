@@ -1,9 +1,9 @@
-export interface Log {
+export interface LogEntry {
   id: string
   taskId: string
   action: LogAction
   description: string
-  timestamp: Date
+  timestamp: string
   userId?: string
   metadata?: Record<string, any>
 }
@@ -14,9 +14,11 @@ export type LogAction =
   | 'task_deleted'
   | 'status_changed'
   | 'priority_changed'
-  | 'assigned'
-  | 'time_logged'
-  | 'comment_added'
+  | 'urgent_set'
+  | 'urgent_resolved'
+  | 'reallocated'
+  | 'blocked'
+  | 'unblocked'
 
 export interface LogCreateInput {
   taskId: string

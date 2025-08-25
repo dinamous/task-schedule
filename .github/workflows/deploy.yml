@@ -1,0 +1,81 @@
+# Nome do seu fluxo de trabalho, visível na aba "Actions" do seu repositório.
+name: Deploy para GitHub Pages
+
+# Este fluxo de trabalho é acionado em cada 'push' para a branch 'main'.
+# Se sua branch principal tiver outro nome (por exemplo, 'master'), mude-o aqui.
+on:
+  push:
+    branches:
+      - main
+
+# Define as permissões que o fluxo de trabalho precisa.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Os 'jobs' são tarefas que serão executadas.
+jobs:
+  # O primeiro job é o de "build" da aplicação.
+  build-and-deploy:
+    # O executor para este job.
+    runs-on: ubuntu-latest
+
+    # Os passos que o job vai seguir.
+    steps:
+      # Passo 1: Faz o 'checkout' do seu repositório.
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      # Passo 2: Configura o ambiente Node.js.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Recomendado usar a versão LTS mais recente.
+
+      # Passo 3: Instala as dependências do projeto.
+      - name: Instalar Dependências
+        run: npm install
+
+      # Passo 4: Executa o comando de build da sua aplicação Vue.js.
+      # Para projetos Vue com Vite, o comando padrão é 'npm run build'.
+      - name: Build da Aplicação
+        run: npm run build
+
+      # Passo 5: Cria um arquivo vazio .nojekyll. Isso é crucial para SPAs (Single-Page Applications)
+      # para evitar que o Jekyll (o gerador de sites padrão do GitHub Pages) ignore
+      # arquivos e diretórios que começam com '_'.
+      - name: Criar arquivo .nojekyll
+        run: touch .nojekyll
+
+      # Passo 6: Configura o GitHub Pages.
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v3
+
+      # Passo 7: Faz o upload dos artefatos de build para o GitHub Pages.
+      - name: Upload dos Artefatos de Build
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # O diretório que o comando de build gerou.
+          # O padrão para projetos Vue é 'dist'.
+          path: 'dist'
+
+  # O segundo job é o de "deploy".
+  deploy:
+    # Este job só vai rodar depois que o job "build-and-deploy" terminar.
+    needs: build-and-deploy
+
+    # Define o ambiente para o deploy.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # O executor para este job.
+    runs-on: ubuntu-latest
+
+    # Os passos que o job vai seguir.
+    steps:
+      # Passo 1: Faz o deploy do site para o GitHub Pages.
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3

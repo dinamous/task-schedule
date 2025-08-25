@@ -1,0 +1,47 @@
+# Nome do fluxo de trabalho.
+name: Verificação de Segurança
+
+# Aciona o workflow em 'push' para a branch 'main' e em um agendamento semanal.
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    # A verificação de segurança rodará toda segunda-feira à 1 da manhã (UTC).
+    - cron: '0 1 * * 1'
+
+# Define as permissões que o fluxo de trabalho precisa.
+permissions:
+  contents: read
+
+# O job para escanear vulnerabilidades.
+jobs:
+  security-scan:
+    # O executor.
+    runs-on: ubuntu-latest
+
+    # Os passos do job.
+    steps:
+      # Passo 1: Faz o 'checkout' do seu repositório.
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      # Passo 2: Configura o ambiente Node.js.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Passo 3: Instala as dependências do projeto.
+      - name: Instalar Dependências
+        run: npm install
+
+      # Passo 4: Executa a auditoria de segurança do npm.
+      # O '--audit-level' define a gravidade mínima das vulnerabilidades para reportar.
+      - name: Executar Auditoria de Segurança
+        run: npm audit --audit-level=high
+
+      # Passo 5: Usa uma ação oficial do GitHub para revisar dependências.
+      # Esta ação vai falhar se houver vulnerabilidades conhecidas na sua árvore de dependências.
+      - name: Verificar Dependências
+        uses: actions/dependency-review-action@v4

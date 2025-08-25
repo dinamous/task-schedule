@@ -1,0 +1,48 @@
+# Nome do fluxo de trabalho.
+name: Integração Contínua (CI)
+
+# Aciona o workflow em 'pull requests' para a branch 'main' e 'push' para a 'main'.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Define as permissões que o fluxo de trabalho precisa.
+permissions:
+  contents: read
+
+# O único job neste workflow é o de teste.
+jobs:
+  test:
+    # O executor.
+    runs-on: ubuntu-latest
+
+    # Os passos do job.
+    steps:
+      # Passo 1: Faz o 'checkout' do seu repositório.
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      # Passo 2: Configura o ambiente Node.js.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Passo 3: Instala as dependências.
+      - name: Instalar Dependências
+        run: npm install
+
+      # Passo 4: Executa os testes do seu projeto.
+      # Este comando é padrão na maioria dos projetos Vue/Vite.
+      - name: Executar Testes
+        run: npm run test
+
+      # Passo 5: Executa o linter para verificar a formatação e possíveis erros.
+      - name: Executar Linter
+        run: npm run lint
+        # O '|| true' garante que o workflow não falhe se o linter encontrar erros.
+        # Você pode remover isso se quiser que os erros do linter falhem no PR.

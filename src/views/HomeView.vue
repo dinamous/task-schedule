@@ -4,9 +4,16 @@
       <h1 class="text-3xl font-bold text-foreground mb-4">
         Bem-vindo ao Task Schedule
       </h1>
-      <p class="text-muted-foreground mb-8">
-        Sua plataforma para gerenciar tarefas com controle de prazos, status e prioridades
-      </p>
+             <p class="text-muted-foreground mb-8">
+         Sua plataforma para gerenciar tarefas com controle de prazos, status e prioridades
+       </p>
+       <div class="flex justify-center">
+         <router-link to="/create">
+           <Button size="lg">
+             Criar Nova Tarefa
+           </Button>
+         </router-link>
+       </div>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -45,4 +52,5 @@
 
 <script setup lang="ts">
 import { Kanban, Calendar, Users } from 'lucide-vue-next'
+import  Button from '@/components/ui/Button.vue'
 </script>

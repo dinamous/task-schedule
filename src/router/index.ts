@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import TaskCreateView from '@/views/TaskCreateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,6 +11,14 @@ const router = createRouter({
       component: HomeView,
       meta: {
         title: 'Task Schedule'
+      }
+    },
+    {
+      path: '/create',
+      name: 'task-create',
+      component: TaskCreateView,
+      meta: {
+        title: 'Nova Tarefa'
       }
     }
   ]

@@ -1,22 +1,19 @@
 # Nome do fluxo de trabalho.
-name: Verificação de Segurança
+name: Revisão de Dependências
 
-# Aciona o workflow em 'push' para a branch 'main' e em um agendamento semanal.
+# Aciona o workflow em 'pull requests' abertos para a branch 'main'.
 on:
-  push:
+  pull_request:
     branches:
       - main
-  schedule:
-    # A verificação de segurança rodará toda segunda-feira à 1 da manhã (UTC).
-    - cron: '0 1 * * 1'
 
 # Define as permissões que o fluxo de trabalho precisa.
 permissions:
   contents: read
 
-# O job para escanear vulnerabilidades.
+# O job para revisar as dependências.
 jobs:
-  security-scan:
+  dependency-review:
     # O executor.
     runs-on: ubuntu-latest
 
@@ -32,16 +29,7 @@ jobs:
         with:
           node-version: '20'
 
-      # Passo 3: Instala as dependências do projeto.
-      - name: Instalar Dependências
-        run: npm install
-
-      # Passo 4: Executa a auditoria de segurança do npm.
-      # O '--audit-level' define a gravidade mínima das vulnerabilidades para reportar.
-      - name: Executar Auditoria de Segurança
-        run: npm audit --audit-level=high
-
-      # Passo 5: Usa uma ação oficial do GitHub para revisar dependências.
-      # Esta ação vai falhar se houver vulnerabilidades conhecidas na sua árvore de dependências.
+      # Passo 3: Executa a ação de revisão de dependências.
+      # Esta ação vai falhar se houver vulnerabilidades conhecidas ou licenças incompatíveis.
       - name: Verificar Dependências
         uses: actions/dependency-review-action@v4

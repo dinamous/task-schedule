@@ -16,6 +16,20 @@ export const useTaskStore = defineStore('task', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
+  // Estado do formulário
+  const formData = ref<TaskCreateInput>({
+    nome: '',
+    link: '',
+    dataInicio: new Date().toISOString().split('T')[0],
+    prazoDias: 5,
+    responsavel: '',
+    gerente: '',
+    status: 'A FAZER',
+    prioridade: undefined,
+    urgente: false,
+    paralelo: false
+  })
+
   // Getters
   const byResponsavel = computed(() => {
     return (responsavel: Role) => {
@@ -94,8 +108,72 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
+  // Ações do formulário
+  function updateFormField<K extends keyof TaskCreateInput>(field: K, value: TaskCreateInput[K]) {
+    formData.value[field] = value
+  }
+
+  function resetForm() {
+    formData.value = {
+      nome: '',
+      link: '',
+      dataInicio: new Date().toISOString().split('T')[0],
+      prazoDias: 5,
+      responsavel: '',
+      gerente: '',
+      status: 'A FAZER',
+      prioridade: undefined,
+      urgente: false,
+      paralelo: false
+    }
+  }
+
+  async function submitForm(): Promise<Task | null> {
+    // Validação básica
+    if (!formData.value.nome.trim()) {
+      throw new Error('Nome da tarefa é obrigatório')
+    }
+
+    if (!formData.value.responsavel) {
+      throw new Error('Responsável é obrigatório')
+    }
+
+    if (!formData.value.gerente.trim()) {
+      throw new Error('Gerente é obrigatório')
+    }
+
+    if (!formData.value.prazoDias || formData.value.prazoDias <= 0) {
+      throw new Error('Prazo deve ser maior que zero')
+    }
+
+    try {
+      // Criar tarefa usando os dados do formulário
+      const taskData = {
+        ...formData.value,
+        nome: formData.value.nome.trim(),
+        gerente: formData.value.gerente.trim(),
+        link: formData.value.link?.trim() || undefined,
+        prazoDias: Number(formData.value.prazoDias),
+        prioridade: formData.value.prioridade ? Number(formData.value.prioridade) : undefined
+      }
+
+      const task = await createTask(taskData)
+      
+      // Reset do formulário após sucesso
+      resetForm()
+      
+      return task
+    } catch (error) {
+      console.error('Erro ao submeter formulário:', error)
+      throw error
+    }
+  }
+
   async function createTask(input: TaskCreateInput): Promise<Task> {
+    console.log('Store: Recebendo dados para criar tarefa:', input)
+    
     const dataFim = calculateDataFim(input.dataInicio, input.prazoDias)
+    console.log('Store: Data fim calculada:', dataFim)
     
     // Aplicar alocação padrão se não for paralela
     let dataInicioFinal = input.dataInicio
@@ -119,9 +197,15 @@ export const useTaskStore = defineStore('task', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
+    
+    console.log('Store: Tarefa criada:', task)
+    console.log('Store: Array de tarefas antes de adicionar:', tasks.value.length)
 
     tasks.value.push(task)
+    console.log('Store: Array de tarefas após adicionar:', tasks.value.length)
+    
     await persistTasks()
+    console.log('Store: Tarefas persistidas no localStorage')
     
     // Registrar log
     await addLog({
@@ -376,17 +460,23 @@ export const useTaskStore = defineStore('task', () => {
 
   // Funções auxiliares
   async function calculateNextAvailableSlot(responsavel: Role, preferredDate: string, prazoDias: number): Promise<string> {
+    console.log('Store: calculateNextAvailableSlot input:', { responsavel, preferredDate, prazoDias })
+    
     const userTasks = tasks.value
       .filter(task => task.responsavel === responsavel && !task.paralelo)
       .sort((a, b) => new Date(b.dataFim).getTime() - new Date(a.dataFim).getTime())
 
+    console.log('Store: Tarefas do usuário encontradas:', userTasks.length)
+
     if (userTasks.length === 0) {
+      console.log('Store: Nenhuma tarefa encontrada, retornando data preferida:', preferredDate)
       return preferredDate
     }
 
     const lastTaskEnd = new Date(userTasks[0].dataFim)
     const nextAvailable = getNextBusinessDay(lastTaskEnd)
     
+    console.log('Store: Próxima data disponível calculada:', nextAvailable.toISOString().split('T')[0])
     return nextAvailable.toISOString().split('T')[0]
   }
 
@@ -414,20 +504,30 @@ export const useTaskStore = defineStore('task', () => {
   }
 
   async function addLog(logInput: LogCreateInput): Promise<void> {
+    console.log('Store: Adicionando log:', logInput)
+    
     const logEntry: LogEntry = {
       id: generateId(),
       ...logInput,
       timestamp: new Date().toISOString()
     }
     
+    console.log('Store: Log entry criado:', logEntry)
+    
     logs.value.push(logEntry)
+    console.log('Store: Log adicionado ao array, total de logs:', logs.value.length)
+    
     await persistLogs()
+    console.log('Store: Logs persistidos no localStorage')
   }
 
   async function persistTasks() {
     try {
+      console.log('Store: Persistindo tarefas, total:', tasks.value.length)
       await persistToStorage(TASKS_STORAGE_KEY, tasks.value)
+      console.log('Store: Tarefas persistidas com sucesso')
     } catch (err) {
+      console.error('Store: Erro ao persistir tarefas:', err)
       error.value = 'Erro ao salvar tarefas'
       logger.error('Erro ao persistir tarefas', err)
     }
@@ -435,8 +535,11 @@ export const useTaskStore = defineStore('task', () => {
 
   async function persistLogs() {
     try {
+      console.log('Store: Persistindo logs, total:', logs.value.length)
       await persistToStorage(LOGS_STORAGE_KEY, logs.value)
+      console.log('Store: Logs persistidos com sucesso')
     } catch (err) {
+      console.error('Store: Erro ao persistir logs:', err)
       logger.error('Erro ao persistir logs', err)
     }
   }
@@ -447,6 +550,7 @@ export const useTaskStore = defineStore('task', () => {
     logs: readonly(logs),
     isLoading: readonly(isLoading),
     error: readonly(error),
+    formData: readonly(formData),
     
     // Getters
     byResponsavel,
@@ -461,6 +565,9 @@ export const useTaskStore = defineStore('task', () => {
     resolveUrgente,
     moveStatus,
     reallocateFor,
-    deleteTask
+    deleteTask,
+    updateFormField,
+    resetForm,
+    submitForm
   }
 })

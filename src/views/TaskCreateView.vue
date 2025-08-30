@@ -18,9 +18,14 @@
 
     <!-- Lista de Tarefas Recentes -->
     <div v-if="recentTasks.length > 0" class="mt-12">
-      <h2 class="text-2xl font-semibold text-foreground mb-4">
-        Tarefas Recentes
-      </h2>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-semibold text-foreground">
+          Tarefas Recentes
+        </h2>
+        <div class="text-sm text-muted-foreground">
+          {{ recentTasks.length }} de {{ taskStore.tasks.length }} tarefas
+        </div>
+      </div>
       <div class="grid gap-4">
         <div
           v-for="task in recentTasks"
@@ -29,26 +34,57 @@
         >
           <div class="flex items-start justify-between">
             <div class="flex-1">
-              <h3 class="font-medium text-foreground mb-1">
-                {{ task.nome }}
-              </h3>
-              <div class="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>{{ task.responsavel }}</span>
-                <span>{{ formatDate(task.dataInicio) }} - {{ formatDate(task.dataFim) }}</span>
+              <div class="flex items-center gap-2 mb-2">
+                <h3 class="font-medium text-foreground">
+                  {{ task.nome }}
+                </h3>
+                <span v-if="task.urgente" class="text-red-600 font-medium text-xs bg-red-100 dark:bg-red-900/20 px-2 py-1 rounded">
+                  URGENTE
+                </span>
+                <span v-if="task.paralelo" class="text-blue-600 font-medium text-xs bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded">
+                  PARALELO
+                </span>
+              </div>
+              
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground mb-2">
+                <div>
+                  <span class="font-medium">Responsável:</span>
+                  <span :class="getRoleColor(task.responsavel)" class="ml-1 px-2 py-1 rounded-full text-xs">
+                    {{ task.responsavel }}
+                  </span>
+                </div>
+                <div>
+                  <span class="font-medium">Gerente:</span>
+                  <span class="ml-1">{{ task.gerente }}</span>
+                </div>
+                <div>
+                  <span class="font-medium">Prazo:</span>
+                  <span class="ml-1">{{ task.prazoDias }} dias</span>
+                </div>
+                <div v-if="task.prioridade">
+                  <span class="font-medium">Prioridade:</span>
+                  <span class="ml-1">{{ task.prioridade }}</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-4 text-sm">
+                <div>
+                  <span class="font-medium">Período:</span>
+                  <span class="ml-1">{{ formatDate(task.dataInicio) }} → {{ formatDate(task.dataFim) }}</span>
+                </div>
                 <span :class="getStatusColor(task.status)" class="px-2 py-1 rounded-full text-xs">
                   {{ task.status }}
                 </span>
-                <span v-if="task.urgente" class="text-red-600 font-medium">
-                  URGENTE
-                </span>
               </div>
             </div>
+            
             <div class="flex items-center gap-2">
               <Button
                 v-if="task.link"
                 variant="outline"
                 size="sm"
                 @click="openLink(task.link)"
+                title="Abrir link"
               >
                 <ExternalLink class="w-4 h-4" />
               </Button>
@@ -66,7 +102,7 @@ import { useRouter } from 'vue-router'
 import  Button from '@/components/ui/Button.vue'
 import  TaskForm  from '@/components/forms/TaskForm.vue'
 import { useTaskStore } from '@/stores/task.store'
-import { formatDate, getStatusColor } from '@/utils/date'
+import { formatDate, getStatusColor, getRoleColor } from '@/utils/date'
 import { ExternalLink } from 'lucide-vue-next'
 
 const router = useRouter()

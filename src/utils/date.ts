@@ -1,6 +1,6 @@
 export function formatDate(date: Date | string): string {
   try {
-    const dateObj = typeof date === 'string' ? new Date(date) : date
+const dateObj = typeof date === 'string' ? new Date(`${date}T00:00:00`) : date
     
     // Verificar se a data é válida
     if (isNaN(dateObj.getTime())) {

@@ -54,7 +54,7 @@
             taskStore.updateFormField('prazoDias', Number(value) || 5);
           }"
           type="number"
-          min="1"
+          min="0"
           placeholder="5"
           required
         />

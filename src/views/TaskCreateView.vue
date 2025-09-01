@@ -109,7 +109,7 @@ const router = useRouter()
 const taskStore = useTaskStore()
 
 const recentTasks = computed(() => {
-  return taskStore.tasks
+  return [...taskStore.tasks] // cria cópia
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5)
 })
@@ -118,7 +118,7 @@ function handleCancel() {
   router.push('/')
 }
 
-function handleCreated(task: any) {
+function handleCreated(_task: any) {
   // Opcional: redirecionar para o quadro Kanban ou calendário
   // router.push('/kanban')
 }

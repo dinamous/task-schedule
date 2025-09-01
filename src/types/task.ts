@@ -1,49 +1,62 @@
+export type TaskStatus = 
+  | 'A FAZER' 
+  | 'FAZENDO' 
+  | 'AGUARDANDO APROVAÇÃO' 
+  | 'QA' 
+  | 'APROVADO' 
+  | 'BLOQUEADO' 
+  | 'URGENTE'
+
+export type Role = 'DEV' | 'QA' | 'UX' | 'DESIGNER' | 'PM' | 'PO' | string
+
 export interface Task {
   id: string
-  title: string
-  description?: string
+  nome: string
+  link?: string
+  dataInicio: string      // ISO
+  prazoDias: number       // em dias úteis
+  dataFim: string         // ISO (calculado)
+  responsavel: Role
+  gerente: string
   status: TaskStatus
-  priority: TaskPriority
-  dueDate?: Date
-  createdAt: Date
-  updatedAt: Date
-  tags: string[]
-  assignee?: string
-  estimatedHours?: number
-  actualHours?: number
+  prioridade?: number     // menor = mais prioritária
+  urgente?: boolean
+  paralelo?: boolean      // permite coexistir com outras
+  createdAt: string
+  updatedAt: string
 }
 
-export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'done'
-
-export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
-
 export interface TaskCreateInput {
-  title: string
-  description?: string
-  priority?: TaskPriority
-  dueDate?: Date
-  tags?: string[]
-  assignee?: string
-  estimatedHours?: number
+  nome: string
+  link?: string
+  dataInicio: string
+  prazoDias: number
+  responsavel: Role
+  gerente: string
+  status?: TaskStatus
+  prioridade?: number
+  urgente?: boolean
+  paralelo?: boolean
 }
 
 export interface TaskUpdateInput {
-  title?: string
-  description?: string
+  nome?: string
+  link?: string
+  dataInicio?: string
+  prazoDias?: number
+  responsavel?: Role
+  gerente?: string
   status?: TaskStatus
-  priority?: TaskPriority
-  dueDate?: Date
-  tags?: string[]
-  assignee?: string
-  estimatedHours?: number
-  actualHours?: number
+  prioridade?: number
+  urgente?: boolean
+  paralelo?: boolean
 }
 
 export interface TaskFilter {
   status?: TaskStatus[]
-  priority?: TaskPriority[]
-  assignee?: string
-  tags?: string[]
-  dueDateFrom?: Date
-  dueDateTo?: Date
+  responsavel?: Role
+  gerente?: string
+  urgente?: boolean
+  dataInicioFrom?: string
+  dataInicioTo?: string
 }

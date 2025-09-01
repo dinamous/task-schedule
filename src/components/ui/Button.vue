@@ -41,11 +41,18 @@ const buttonVariants = cva(
   }
 )
 
-interface Props extends VariantProps<typeof buttonVariants> {
+// 🔧 extraímos os tipos necessários do VariantProps
+type ButtonVariants = VariantProps<typeof buttonVariants>
+
+type Props = {
+  variant?: ButtonVariants['variant']
+  size?: ButtonVariants['size']
   className?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  variant: 'default',
+  size: 'default',
   className: ''
 })
 

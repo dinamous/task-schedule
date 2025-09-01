@@ -4,9 +4,16 @@
       <h1 class="text-3xl font-bold text-foreground mb-4">
         Bem-vindo ao Task Schedule
       </h1>
-      <p class="text-muted-foreground mb-8">
-        Sua plataforma para gerenciar tarefas com controle de prazos, status e prioridades
-      </p>
+             <p class="text-muted-foreground mb-8">
+         Sua plataforma para gerenciar tarefas com controle de prazos, status e prioridades
+       </p>
+       <div class="flex justify-center">
+         <router-link to="/create">
+           <Button size="lg">
+             Criar Nova Tarefa
+           </Button>
+         </router-link>
+       </div>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -15,9 +22,14 @@
           <Kanban class="w-6 h-6 text-blue-600 dark:text-blue-400" />
         </div>
         <h3 class="text-lg font-semibold text-foreground mb-2">Quadro Kanban</h3>
-        <p class="text-muted-foreground text-sm">
+        <p class="text-muted-foreground text-sm mb-4">
           Organize suas tarefas por status com drag and drop
         </p>
+        <router-link to="/board">
+          <Button variant="outline" class="w-full">
+            Acessar Quadro
+          </Button>
+        </router-link>
       </div>
       
       <div class="bg-card border border-border rounded-lg p-6">
@@ -25,9 +37,12 @@
           <Calendar class="w-6 h-6 text-green-600 dark:text-green-400" />
         </div>
         <h3 class="text-lg font-semibold text-foreground mb-2">Calendário</h3>
-        <p class="text-muted-foreground text-sm">
+        <p class="text-muted-foreground text-sm mb-4">
           Visualize suas tarefas em formato de calendário
         </p>
+        <Button variant="outline" class="w-full" disabled>
+          Em Breve
+        </Button>
       </div>
       
       <div class="bg-card border border-border rounded-lg p-6">
@@ -35,9 +50,12 @@
           <Users class="w-6 h-6 text-purple-600 dark:text-purple-400" />
         </div>
         <h3 class="text-lg font-semibold text-foreground mb-2">Responsáveis</h3>
-        <p class="text-muted-foreground text-sm">
+        <p class="text-muted-foreground text-sm mb-4">
           Gerencie tarefas por responsáveis e equipes
         </p>
+        <Button variant="outline" class="w-full" disabled>
+          Em Breve
+        </Button>
       </div>
     </div>
   </div>
@@ -45,4 +63,5 @@
 
 <script setup lang="ts">
 import { Kanban, Calendar, Users } from 'lucide-vue-next'
+import  Button from '@/components/ui/Button.vue'
 </script>

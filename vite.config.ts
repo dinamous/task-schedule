@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
+  base: '/task-schedule/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

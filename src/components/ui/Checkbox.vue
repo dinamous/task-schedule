@@ -4,7 +4,7 @@
       type="checkbox"
       :class="checkboxVariants({ class: className })"
       :checked="checked"
-      @change="$emit('update:checked', $event.target.checked)"
+      @change="$emit('update:checked', ($event.target as HTMLInputElement).checked)"
       v-bind="$attrs"
     />
     <label v-if="$slots.default" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

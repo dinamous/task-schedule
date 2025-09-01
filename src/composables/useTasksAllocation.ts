@@ -1,22 +1,27 @@
 import { computed } from 'vue'
-import type { Task } from '@/types/task'
+import type { Task, TaskStatus, Role } from '@/types/task'
 import { isOverdue, isDueSoon, getDaysUntil } from '@/utils/date'
 
 export function useTasksAllocation(tasks: Task[]) {
+  /** Estatísticas gerais */
   const allocationStats = computed(() => {
-    const stats = {
+    const stats: {
+      total: number
+      byStatus: Record<TaskStatus, number>
+      overdue: number
+      dueSoon: number
+      completed: number
+      inProgress: number
+    } = {
       total: tasks.length,
       byStatus: {
-        todo: 0,
-        'in-progress': 0,
-        review: 0,
-        done: 0
-      },
-      byPriority: {
-        urgent: 0,
-        high: 0,
-        medium: 0,
-        low: 0
+        'A FAZER': 0,
+        'FAZENDO': 0,
+        'AGUARDANDO APROVAÇÃO': 0,
+        'QA': 0,
+        'APROVADO': 0,
+        'BLOQUEADO': 0,
+        'URGENTE': 0
       },
       overdue: 0,
       dueSoon: 0,
@@ -26,113 +31,105 @@ export function useTasksAllocation(tasks: Task[]) {
 
     tasks.forEach(task => {
       stats.byStatus[task.status]++
-      stats.byPriority[task.priority]++
-      
-      if (task.status === 'done') {
-        stats.completed++
-      } else if (task.status === 'in-progress' || task.status === 'review') {
+
+      if (task.status === 'APROVADO') stats.completed++
+      else if (task.status === 'FAZENDO' || task.status === 'AGUARDANDO APROVAÇÃO' || task.status === 'QA')
         stats.inProgress++
-      }
-      
-      if (task.dueDate) {
-        if (isOverdue(task.dueDate)) {
-          stats.overdue++
-        } else if (isDueSoon(task.dueDate)) {
-          stats.dueSoon++
-        }
+
+      if (task.dataFim) {
+        const due = new Date(task.dataFim)
+        if (isOverdue(due)) stats.overdue++
+        else if (isDueSoon(due)) stats.dueSoon++
       }
     })
 
     return stats
   })
 
+  /** Distribuição por responsável */
   const workloadDistribution = computed(() => {
-    const assignees = new Map<string, { tasks: Task[], totalHours: number }>()
-    
+    const assignees = new Map<Role, { tasks: Task[] }>()
+
     tasks.forEach(task => {
-      if (task.assignee) {
-        if (!assignees.has(task.assignee)) {
-          assignees.set(task.assignee, { tasks: [], totalHours: 0 })
-        }
-        
-        const assignee = assignees.get(task.assignee)!
-        assignee.tasks.push(task)
-        assignee.totalHours += task.estimatedHours || 0
+      const assignee = task.responsavel
+      if (!assignees.has(assignee)) {
+        assignees.set(assignee, { tasks: [] })
       }
+      assignees.get(assignee)!.tasks.push(task)
     })
-    
+
     return Array.from(assignees.entries()).map(([name, data]) => ({
       name,
       taskCount: data.tasks.length,
-      totalHours: data.totalHours,
       tasks: data.tasks
     }))
   })
 
+  /** Distribuição por prioridade (menor número = mais prioritária) */
   const priorityDistribution = computed(() => {
-    const distribution = {
-      urgent: [] as Task[],
-      high: [] as Task[],
-      medium: [] as Task[],
-      low: [] as Task[]
+    const distribution: { high: Task[]; medium: Task[]; low: Task[] } = {
+      high: [],
+      medium: [],
+      low: []
     }
-    
+
     tasks.forEach(task => {
-      distribution[task.priority].push(task)
+      if (task.prioridade !== undefined) {
+        if (task.prioridade <= 2) distribution.high.push(task)
+        else if (task.prioridade <= 4) distribution.medium.push(task)
+        else distribution.low.push(task)
+      }
     })
-    
+
     return distribution
   })
 
+  /** Distribuição temporal */
   const timeBasedAllocation = computed(() => {
     const today = new Date()
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
     const nextMonth = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
-    
+
     return {
-      overdue: tasks.filter(task => task.dueDate && isOverdue(task.dueDate)),
-      dueToday: tasks.filter(task => task.dueDate && getDaysUntil(task.dueDate) === 0),
-      dueThisWeek: tasks.filter(task => 
-        task.dueDate && 
-        task.dueDate >= today && 
-        task.dueDate <= nextWeek
+      overdue: tasks.filter(task => task.dataFim && isOverdue(new Date(task.dataFim))),
+      dueToday: tasks.filter(task => task.dataFim && getDaysUntil(new Date(task.dataFim)) === 0),
+      dueThisWeek: tasks.filter(
+        task => task.dataFim && new Date(task.dataFim) >= today && new Date(task.dataFim) <= nextWeek
       ),
-      dueThisMonth: tasks.filter(task => 
-        task.dueDate && 
-        task.dueDate >= today && 
-        task.dueDate <= nextMonth
+      dueThisMonth: tasks.filter(
+        task => task.dataFim && new Date(task.dataFim) >= today && new Date(task.dataFim) <= nextMonth
       ),
-      noDueDate: tasks.filter(task => !task.dueDate)
+      noDueDate: tasks.filter(task => !task.dataFim)
     }
   })
 
+  /** Ordenação de tarefas por prioridade e datas */
   function getOptimalTaskOrder(): Task[] {
     return [...tasks].sort((a, b) => {
-      // Prioridade por urgência
-      const priorityOrder = { urgent: 4, high: 3, medium: 2, low: 1 }
-      const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]
-      if (priorityDiff !== 0) return priorityDiff
-      
-      // Se mesma prioridade, ordenar por data de vencimento
-      if (a.dueDate && b.dueDate) {
-        return a.dueDate.getTime() - b.dueDate.getTime()
-      }
-      
-      // Tarefas com data vêm antes das sem data
-      if (a.dueDate && !b.dueDate) return -1
-      if (!a.dueDate && b.dueDate) return 1
-      
-      // Por fim, ordenar por data de criação (mais antigas primeiro)
-      return a.createdAt.getTime() - b.createdAt.getTime()
+      const aPriority = a.prioridade ?? 99
+      const bPriority = b.prioridade ?? 99
+      if (aPriority !== bPriority) return aPriority - bPriority
+
+      const aDue = a.dataFim ? new Date(a.dataFim) : null
+      const bDue = b.dataFim ? new Date(b.dataFim) : null
+      if (aDue && bDue) return aDue.getTime() - bDue.getTime()
+      if (aDue && !bDue) return -1
+      if (!aDue && bDue) return 1
+
+      const aCreated = new Date(a.createdAt)
+      const bCreated = new Date(b.createdAt)
+      return aCreated.getTime() - bCreated.getTime()
     })
   }
 
-  function getTasksForAssignee(assignee: string): Task[] {
-    return tasks.filter(task => task.assignee === assignee)
+  /** Tarefas de um responsável específico */
+  function getTasksForAssignee(assignee: Role): Task[] {
+    return tasks.filter(task => task.responsavel === assignee)
   }
 
+  /** Tarefas por tag (se existir) */
   function getTasksByTag(tag: string): Task[] {
-    return tasks.filter(task => task.tags.includes(tag))
+    return tasks.filter(task => task.link?.includes(tag)) // caso queira usar `tags` adicione na interface Task
   }
 
   return {

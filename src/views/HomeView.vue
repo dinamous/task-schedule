@@ -36,13 +36,15 @@
         <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4 mx-auto">
           <Calendar class="w-6 h-6 text-green-600 dark:text-green-400" />
         </div>
-        <h3 class="text-lg font-semibold text-foreground mb-2">Calendário</h3>
+        <h3 class="text-lg font-semibold text-foreground mb-2">Calendário de Dias Úteis</h3>
         <p class="text-muted-foreground text-sm mb-4">
-          Visualize suas tarefas em formato de calendário
+          Visualize tarefas em dias úteis com alocação inteligente
         </p>
-        <Button variant="outline" class="w-full" disabled>
-          Em Breve
-        </Button>
+        <router-link to="/calendar">
+          <Button variant="outline" class="w-full">
+            Acessar Calendário
+          </Button>
+        </router-link>
       </div>
       
       <div class="bg-card border border-border rounded-lg p-6">
@@ -53,9 +55,11 @@
         <p class="text-muted-foreground text-sm mb-4">
           Gerencie tarefas por responsáveis e equipes
         </p>
-        <Button variant="outline" class="w-full" disabled>
-          Em Breve
-        </Button>
+        <router-link to="/responsables">
+          <Button variant="outline" class="w-full">
+            Gerenciar Equipe
+          </Button>
+        </router-link>
       </div>
     </div>
   </div>

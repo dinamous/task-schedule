@@ -2,10 +2,10 @@
   <div class="max-w-4xl mx-auto">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-foreground mb-2">
-        Nova Tarefa
+        {{ isEditing ? 'Editar Tarefa' : 'Nova Tarefa' }}
       </h1>
       <p class="text-muted-foreground">
-        Cadastre uma nova tarefa com controle de prazos, responsáveis e prioridades
+        {{ isEditing ? 'Edite os dados da tarefa selecionada' : 'Cadastre uma nova tarefa com controle de prazos, responsáveis e prioridades' }}
       </p>
     </div>
 
@@ -13,6 +13,7 @@
       <TaskForm
         @cancel="handleCancel"
         @created="handleCreated"
+        @updated="handleUpdated"
       />
     </div>
 
@@ -108,6 +109,8 @@ import { ExternalLink } from 'lucide-vue-next'
 const router = useRouter()
 const taskStore = useTaskStore()
 
+// Computed properties
+const isEditing = computed(() => taskStore.isEditing)
 const recentTasks = computed(() => {
   return [...taskStore.tasks] // cria cópia
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -121,6 +124,11 @@ function handleCancel() {
 function handleCreated(_task: any) {
   // Opcional: redirecionar para o quadro Kanban ou calendário
   // router.push('/kanban')
+}
+
+function handleUpdated(_task: any) {
+  // Redirecionar para o quadro Kanban após edição
+  router.push('/board')
 }
 
 function openLink(link: string) {

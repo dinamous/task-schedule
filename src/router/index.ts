@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import TaskCreateView from '@/views/TaskCreateView.vue'
 import TasksBoardView from '@/views/TasksBoardView.vue'
+import BusinessDaysCalendarView from '@/views/BusinessDaysCalendarView.vue'
+import TestCalendarView from '@/views/TestCalendarView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +30,22 @@ const router = createRouter({
       component: TasksBoardView,
       meta: {
         title: 'Quadro Kanban'
+      }
+    },
+    {
+      path: '/calendar',
+      name: 'business-days-calendar',
+      component: BusinessDaysCalendarView,
+      meta: {
+        title: 'Calendário de Dias Úteis'
+      }
+    },
+    {
+      path: '/test-calendar',
+      name: 'test-calendar',
+      component: TestCalendarView,
+      meta: {
+        title: 'Teste - Calendário'
       }
     }
   ]

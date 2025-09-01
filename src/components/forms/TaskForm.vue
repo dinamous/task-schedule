@@ -6,7 +6,7 @@
         <Input
           id="nome"
           :value="taskStore.formData.nome || ''"
-          @input="(e) => {
+          @input="(e: Event) => {
             const value = (e.target as HTMLInputElement).value;
             taskStore.updateFormField('nome', value);
           }"
@@ -21,7 +21,7 @@
         <Input
           id="link"
           :value="taskStore.formData.link || ''"
-          @input="(e) => {
+          @input="(e: Event) => {
             const value = (e.target as HTMLInputElement).value;
             taskStore.updateFormField('link', value === '' ? undefined : value);
           }"
@@ -35,7 +35,7 @@
         <Input
           id="dataInicio"
           :value="taskStore.formData.dataInicio || new Date().toISOString().split('T')[0]"
-          @input="(e) => {
+          @input="(e: Event) => {
             const value = (e.target as HTMLInputElement).value;
             taskStore.updateFormField('dataInicio', value);
           }"
@@ -49,7 +49,7 @@
         <Input
           id="prazoDias"
           :value="taskStore.formData.prazoDias || 5"
-          @input="(e) => {
+          @input="(e: Event) => {
             const value = (e.target as HTMLInputElement).value;
             taskStore.updateFormField('prazoDias', Number(value) || 5);
           }"
@@ -65,7 +65,7 @@
         <Select 
           id="responsavel" 
           :value="taskStore.formData.responsavel || ''" 
-          @change="(e) => {
+          @change="(e: Event) => {
             const value = (e.target as HTMLSelectElement).value;
             taskStore.updateFormField('responsavel', value);
           }"
@@ -86,7 +86,7 @@
         <Input
           id="gerente"
           :value="taskStore.formData.gerente || ''"
-          @input="(e) => {
+          @input="(e: Event) => {
             const value = (e.target as HTMLInputElement).value;
             taskStore.updateFormField('gerente', value);
           }"
@@ -101,7 +101,7 @@
         <Select 
           id="status" 
           :value="taskStore.formData.status || 'A FAZER'"
-          @change="(e) => {
+          @change="(e: Event) => {
             const value = (e.target as HTMLSelectElement).value;
             taskStore.updateFormField('status', value);
           }"
@@ -119,7 +119,7 @@
         <Input
           id="prioridade"
           :value="taskStore.formData.prioridade || ''"
-          @input="(e) => {
+          @input="(e: Event) => {
             const value = (e.target as HTMLInputElement).value;
             taskStore.updateFormField('prioridade', value === '' ? undefined : Number(value));
           }"
@@ -135,7 +135,7 @@
         <Checkbox
           id="urgente"
           :checked="taskStore.formData.urgente"
-          @change="(e) => taskStore.updateFormField('urgente', (e.target as HTMLInputElement).checked)"
+          @change="(e: Event) => taskStore.updateFormField('urgente', (e.target as HTMLInputElement).checked)"
         >
           Urgente
         </Checkbox>
@@ -143,7 +143,7 @@
         <Checkbox
           id="paralelo"
           :checked="taskStore.formData.paralelo"
-          @change="(e) => taskStore.updateFormField('paralelo', (e.target as HTMLInputElement).checked)"
+          @change="(e: Event) => taskStore.updateFormField('paralelo', (e.target as HTMLInputElement).checked)"
         >
           Permite execução paralela
         </Checkbox>

@@ -10,7 +10,9 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "stylelint": "stylelint \"src/**/*.{css,vue}\" --fix",
-    "test": "vitest"
+    "test": "vitest",
+    "prepare": "husky install",
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
@@ -33,6 +35,8 @@
     "autoprefixer": "^10.4.0",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6",
     "postcss": "^8.4.0",
     "prettier": "^3.3.0",
     "stylelint": "^16.0.0",
@@ -43,5 +47,10 @@
     "vite": "^7.1.2",
     "vitest": "^3.2.4",
     "vue-tsc": "^3.0.5"
-  }
+  },
+  "lint-staged": {
+  "*.{js,ts,vue}": [
+    "eslint --fix"
+  ]
+}
 }

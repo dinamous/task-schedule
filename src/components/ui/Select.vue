@@ -1,6 +1,8 @@
 <template>
   <select
     :class="selectVariants({ size, class: className })"
+    :value="modelValue"
+    @change="$emit('update:modelValue', $event.target.value)"
     v-bind="$attrs"
   >
     <slot />
@@ -31,11 +33,17 @@ const selectVariants = cva(
 interface Props {
   size?: 'default' | 'sm' | 'lg'
   className?: string
+  modelValue?: string | number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  className: ''
+  className: '',
+  modelValue: ''
 })
 
 const className = computed(() => cn(props.className))
+
+defineEmits<{
+  'update:modelValue': [value: string | number]
+}>()
 </script>

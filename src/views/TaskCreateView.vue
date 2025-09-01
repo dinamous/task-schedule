@@ -82,7 +82,7 @@
               <Button
                 v-if="task.link"
                 variant="outline"
-                size="sm"
+                size="default"
                 @click="openLink(task.link)"
                 title="Abrir link"
               >

@@ -3,6 +3,8 @@
     <input
       type="checkbox"
       :class="checkboxVariants({ class: className })"
+      :checked="checked"
+      @change="$emit('update:checked', $event.target.checked)"
       v-bind="$attrs"
     />
     <label v-if="$slots.default" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -26,11 +28,17 @@ const checkboxVariants = cva(
 
 interface Props {
   className?: string
+  checked?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  className: ''
+  className: '',
+  checked: false
 })
 
 const className = computed(() => cn(props.className))
+
+defineEmits<{
+  'update:checked': [value: boolean]
+}>()
 </script>

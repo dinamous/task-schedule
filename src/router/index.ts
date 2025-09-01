@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import TaskCreateView from '@/views/TaskCreateView.vue'
+import TasksBoardView from '@/views/TasksBoardView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +20,14 @@ const router = createRouter({
       component: TaskCreateView,
       meta: {
         title: 'Nova Tarefa'
+      }
+    },
+    {
+      path: '/board',
+      name: 'tasks-board',
+      component: TasksBoardView,
+      meta: {
+        title: 'Quadro Kanban'
       }
     }
   ]

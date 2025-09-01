@@ -568,6 +568,7 @@ export const useTaskStore = defineStore('task', () => {
     deleteTask,
     updateFormField,
     resetForm,
-    submitForm
+    submitForm,
+    addLog
   }
 })

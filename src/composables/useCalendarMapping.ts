@@ -5,53 +5,44 @@ export function useCalendarMapping(tasks: Task[]) {
   const calendarEvents = computed(() => {
     return tasks.map(task => ({
       id: task.id,
-      title: task.title,
-      start: task.dueDate ? task.dueDate.toISOString().split('T')[0] : null,
-      end: task.dueDate ? task.dueDate.toISOString().split('T')[0] : null,
+      title: task.nome, // antes era task.title
+      start: task.dataFim ? new Date(task.dataFim).toISOString().split('T')[0] : null,
+      end: task.dataFim ? new Date(task.dataFim).toISOString().split('T')[0] : null,
       allDay: true,
-      backgroundColor: getEventColor(task.priority, task.status),
-      borderColor: getEventColor(task.priority, task.status),
+      backgroundColor: getEventColor(task.prioridade, task.status),
+      borderColor: getEventColor(task.prioridade, task.status),
       textColor: '#ffffff',
       extendedProps: {
         task,
-        priority: task.priority,
+        priority: task.prioridade,
         status: task.status,
-        description: task.description,
-        assignee: task.assignee
+        description: task.link || '', // antes era task.description
+        assignee: task.responsavel   // antes era task.assignee
       }
     })).filter(event => event.start !== null)
   })
 
   const eventsByDate = computed(() => {
     const grouped: Record<string, any[]> = {}
-    
     calendarEvents.value.forEach(event => {
       if (event.start) {
-        if (!grouped[event.start]) {
-          grouped[event.start] = []
-        }
+        if (!grouped[event.start]) grouped[event.start] = []
         grouped[event.start].push(event)
       }
     })
-    
     return grouped
   })
 
-  function getEventColor(priority: string, status: string): string {
-    if (status === 'done') return '#10b981' // green
+  function getEventColor(priority?: number, status?: string): string {
+    if (status === 'APROVADO') return '#10b981' // verde
     
-    switch (priority) {
-      case 'urgent':
-        return '#ef4444' // red
-      case 'high':
-        return '#f97316' // orange
-      case 'medium':
-        return '#eab308' // yellow
-      case 'low':
-        return '#22c55e' // green
-      default:
-        return '#6b7280' // gray
+    if (priority !== undefined) {
+      if (priority <= 2) return '#ef4444' // vermelho
+      if (priority <= 4) return '#f97316' // laranja
+      return '#eab308' // amarelo
     }
+
+    return '#6b7280' // cinza padrão
   }
 
   function getEventsForDate(date: string) {
@@ -60,13 +51,11 @@ export function useCalendarMapping(tasks: Task[]) {
 
   function getEventsForDateRange(startDate: string, endDate: string) {
     const events: any[] = []
-    
     Object.entries(eventsByDate.value).forEach(([date, dateEvents]) => {
       if (date >= startDate && date <= endDate) {
         events.push(...dateEvents)
       }
     })
-    
     return events
   }
 

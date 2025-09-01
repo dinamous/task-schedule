@@ -2,7 +2,7 @@
   <select
     :class="selectVariants({ size, class: className })"
     :value="modelValue"
-    @change="$emit('update:modelValue', $event.target.value)"
+    @change="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     v-bind="$attrs"
   >
     <slot />

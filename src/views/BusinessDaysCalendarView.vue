@@ -31,7 +31,7 @@
 
     <!-- Calendário de dias úteis -->
     <BusinessDaysCalendar
-      :tasks="tasks"
+      :tasks="[...tasks]"
       @task-click="handleTaskClick"
     />
 

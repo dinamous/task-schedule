@@ -31,7 +31,7 @@
       
       <!-- Componente do calendário -->
       <BusinessDaysCalendar
-        :tasks="tasks"
+        :tasks="[...tasks]"
         @task-click="handleTaskClick"
       />
     </div>

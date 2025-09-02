@@ -1,92 +1,143 @@
 # Task Schedule
 
-Uma plataforma moderna para gerenciamento de tarefas com controle de prazos, status, prioridades e visualização em quadro Kanban e calendário.
+Uma aplicação moderna para gerenciamento de tarefas com controle de prazos, status e prioridades, desenvolvida com Vue 3, TypeScript e Tailwind CSS.
 
-## 🚀 Tecnologias
+## 🚀 Funcionalidades
 
-- **Vue 3** - Framework JavaScript progressivo
-- **Pinia** - Gerenciamento de estado
-- **TailwindCSS** - Framework CSS utilitário
-- **shadcn/ui** - Componentes de UI modernos
-- **TypeScript** - Tipagem estática
-- **Vite** - Build tool e dev server
+### ✨ Funcionalidades Principais
+- **Criação e Gerenciamento de Tarefas**: Sistema completo de CRUD para tarefas
+- **Controle de Prazos**: Cálculo automático de datas finais considerando apenas dias úteis
+- **Sistema de Status**: Kanban board com drag & drop para controle de progresso
+- **Gestão de Responsáveis**: Atribuição de tarefas a diferentes perfis (DEV, QA, UX, etc.)
+- **Controle de Prioridades**: Sistema de priorização numérica (menor = mais prioritária)
+- **Tarefas Urgentes**: Sistema de marcação de urgência com bloqueio automático
+- **Execução Paralela**: Suporte a tarefas que podem ser executadas simultaneamente
 
-## ✨ Funcionalidades
+### 🗓️ Calendário de Dias Úteis
+- **Renderização Inteligente**: Tarefas são exibidas apenas em dias úteis (segunda a sexta)
+- **Múltiplas Tarefas por Dia**: Suporte a várias tarefas no mesmo dia
+- **Alocação Sequencial**: Lógica automática para evitar conflitos de agenda
+- **Visualização por Semana**: Layout semanal com indicação de fins de semana
+- **Estatísticas de Alocação**: Métricas de distribuição de trabalho por responsável
+- **Detecção de Conflitos**: Identificação automática de sobreposições de tarefas
 
-- ✅ **Setup do Projeto** - Estrutura base com Vue 3, Pinia e TailwindCSS
-- ✅ **Tema Claro/Escuro** - Suporte completo a temas com persistência
-- ✅ **Interface Responsiva** - Design mobile-first
-- ✅ **Componentização** - Estrutura escalável de componentes
-- 🔄 **Quadro Kanban** - Organização de tarefas por status
-- 🔄 **Calendário** - Visualização temporal das tarefas
-- 🔄 **Gerenciamento de Tarefas** - CRUD completo
-- 🔄 **Responsáveis** - Atribuição e controle por usuários
+### 🔄 Sistema de Edição
+- **Edição Completa**: Formulário que se auto-preenche com dados da tarefa
+- **CRUD Integrado**: Mesmo formulário para criação e edição
+- **Validação Inteligente**: Verificações automáticas de conflitos e disponibilidade
+- **Histórico de Alterações**: Log completo de todas as modificações
 
-## 🛠️ Instalação
+### 📊 Dashboard e Relatórios
+- **Estatísticas Gerais**: Total de tarefas, dias úteis, média por dia
+- **Distribuição por Responsável**: Visão detalhada da carga de trabalho
+- **Análise de Conflitos**: Identificação de problemas de alocação
+- **Filtros Avançados**: Busca por responsável, status e período
 
-```bash
-# Instalar dependências
-npm install
+## 🛠️ Tecnologias
 
-# Executar em modo desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-
-# Preview do build
-npm run preview
-```
+- **Frontend**: Vue 3 + TypeScript + Composition API
+- **Estilização**: Tailwind CSS
+- **Estado**: Pinia
+- **Roteamento**: Vue Router 4
+- **Ícones**: Lucide Vue
+- **Build Tool**: Vite
 
 ## 📁 Estrutura do Projeto
 
 ```
 src/
 ├── components/          # Componentes reutilizáveis
-│   ├── ui/             # Componentes base do shadcn/ui
-│   ├── calendar/       # Componentes específicos do calendário
-│   ├── kanban/         # Componentes específicos do Kanban
-│   ├── forms/          # Componentes de formulário
-│   └── common/         # Componentes comuns
-├── composables/        # Composables Vue
-├── stores/             # Stores do Pinia
-├── views/              # Páginas/Views da aplicação
-├── lib/                # Utilitários e configurações
-└── types/              # Definições de tipos TypeScript
+│   ├── forms/          # Formulários
+│   ├── ui/             # Componentes de interface
+│   └── BusinessDaysCalendar.vue  # Calendário de dias úteis
+├── composables/         # Composables Vue
+│   ├── useBusinessDaysRendering.ts  # Lógica de renderização
+│   ├── useTasksAllocation.ts        # Alocação de tarefas
+│   └── useCalendarMapping.ts        # Mapeamento do calendário
+├── stores/              # Stores Pinia
+│   └── task.store.ts    # Store principal de tarefas
+├── types/               # Definições de tipos TypeScript
+├── utils/               # Utilitários e helpers
+└── views/               # Páginas da aplicação
+    ├── HomeView.vue     # Página inicial
+    ├── TaskCreateView.vue  # Criação/edição de tarefas
+    ├── TasksBoardView.vue  # Quadro Kanban
+    └── BusinessDaysCalendarView.vue  # Calendário de dias úteis
 ```
 
-## 🎨 Design System
+## 🚀 Como Usar
 
-O projeto utiliza o design system do shadcn/ui com:
+### 1. Instalação
+```bash
+npm install
+```
 
-- **Cores**: Sistema de cores HSL com suporte a tema escuro
-- **Tipografia**: Escala tipográfica consistente
-- **Espaçamento**: Sistema de espaçamento baseado em TailwindCSS
-- **Componentes**: Biblioteca de componentes acessíveis e customizáveis
+### 2. Execução em Desenvolvimento
+```bash
+npm run dev
+```
 
-## 🔧 Scripts Disponíveis
+### 3. Build para Produção
+```bash
+npm run build
+```
 
-- `npm run dev` - Servidor de desenvolvimento
-- `npm run build` - Build para produção
-- `npm run preview` - Preview do build
-- `npm run lint` - Linting do código
-- `npm run format` - Formatação do código
-- `npm run stylelint` - Linting de estilos
+## 📋 Funcionalidades do Calendário de Dias Úteis
 
-## 📝 Próximos Passos
+### Renderização Inteligente
+- **Dias Úteis**: Tarefas são renderizadas apenas de segunda a sexta
+- **Fins de Semana**: Sábados e domingos são automaticamente pulados
+- **Múltiplas Tarefas**: Suporte a várias tarefas no mesmo dia
+- **Indicadores Visuais**: Cores diferentes para status, prioridade e urgência
 
-1. **Step 2** - Implementação do Quadro Kanban
-2. **Step 3** - Implementação do Calendário
-3. **Step 4** - Sistema de Gerenciamento de Tarefas
-4. **Step 5** - Sistema de Responsáveis
-5. **Step 6** - Funcionalidades Avançadas
+### Alocação Automática
+- **Sequencial**: Tarefas não-paralelas são alocadas sequencialmente
+- **Conflitos**: Detecção automática de sobreposições
+- **Reorganização**: Botão para reorganizar agenda de um responsável
+- **Estatísticas**: Métricas de distribuição de trabalho
+
+### Filtros e Visualização
+- **Por Responsável**: Filtrar tarefas por pessoa responsável
+- **Layout Semanal**: Visualização organizada por semanas
+- **Modal de Detalhes**: Clique na tarefa para ver informações completas
+- **Navegação**: Links diretos para edição e visualização no quadro
+
+## 🔧 Configuração
+
+### Variáveis de Ambiente
+Crie um arquivo `.env.local` na raiz do projeto:
+
+```env
+VITE_APP_TITLE=Task Schedule
+VITE_APP_DESCRIPTION=Sistema de gerenciamento de tarefas
+```
+
+### Personalização de Cores
+As cores dos status e prioridades podem ser personalizadas no arquivo `src/composables/useCalendarMapping.ts`.
+
+## 📱 Responsividade
+
+A aplicação é totalmente responsiva e funciona em:
+- 📱 Dispositivos móveis
+- 💻 Tablets
+- 🖥️ Desktops
 
 ## 🤝 Contribuição
 
-Este projeto segue as melhores práticas de desenvolvimento frontend:
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
 
-- **Clean Code** - Código limpo e legível
-- **Componentização** - Componentes pequenos e focados
-- **TypeScript** - Tipagem estática para maior segurança
-- **Acessibilidade** - Componentes acessíveis por padrão
-- **Performance** - Otimizações de performance
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+## 🆘 Suporte
+
+Se você encontrar algum problema ou tiver dúvidas, abra uma issue no repositório.
+
+---
+
+**Desenvolvido com ❤️ usando Vue 3 e TypeScript**

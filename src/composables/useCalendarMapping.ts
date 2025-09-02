@@ -5,21 +5,23 @@ export function useCalendarMapping(tasks: Task[]) {
   const calendarEvents = computed(() => {
     return tasks.map(task => ({
       id: task.id,
-      title: task.nome, // antes era task.title
-      start: task.dataFim ? new Date(task.dataFim).toISOString().split('T')[0] : null,
-      end: task.dataFim ? new Date(task.dataFim).toISOString().split('T')[0] : null,
+      title: task.nome,
+      start: task.dataInicio,
+      end: task.dataFim,
       allDay: true,
-      backgroundColor: getEventColor(task.prioridade, task.status),
-      borderColor: getEventColor(task.prioridade, task.status),
+      backgroundColor: getEventColor(task.prioridade, task.status, task.urgente),
+      borderColor: getEventColor(task.prioridade, task.status, task.urgente),
       textColor: '#ffffff',
       extendedProps: {
         task,
         priority: task.prioridade,
         status: task.status,
-        description: task.link || '', // antes era task.description
-        assignee: task.responsavel   // antes era task.assignee
+        description: task.link || '',
+        assignee: task.responsavel,
+        urgente: task.urgente,
+        paralelo: task.paralelo
       }
-    })).filter(event => event.start !== null)
+    }))
   })
 
   const eventsByDate = computed(() => {
@@ -33,16 +35,21 @@ export function useCalendarMapping(tasks: Task[]) {
     return grouped
   })
 
-  function getEventColor(priority?: number, status?: string): string {
+  function getEventColor(priority?: number, status?: string, urgente?: boolean): string {
+    // Prioridade para tarefas urgentes
+    if (urgente) return '#ef4444' // vermelho
+    
     if (status === 'APROVADO') return '#10b981' // verde
+    if (status === 'URGENTE') return '#f97316' // laranja
+    if (status === 'BLOQUEADO') return '#6b7280' // cinza
     
     if (priority !== undefined) {
-      if (priority <= 2) return '#ef4444' // vermelho
+      if (priority <= 2) return '#dc2626' // vermelho escuro
       if (priority <= 4) return '#f97316' // laranja
       return '#eab308' // amarelo
     }
 
-    return '#6b7280' // cinza padrão
+    return '#3b82f6' // azul padrão
   }
 
   function getEventsForDate(date: string) {

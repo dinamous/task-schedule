@@ -118,6 +118,10 @@ interface Props {
   task: Task
 }
 
+const emit = defineEmits<{
+  edit: [task: Task]
+}>()
+
 defineProps<Props>()
 const taskStore = useTaskStore()
 const uiStore = useUIStore()
@@ -129,13 +133,26 @@ function openLink(link: string) {
 }
 
 function editTask(task: Task) {
-  // TODO: Implementar edição de tarefa
-  console.log('Editar tarefa:', task)
-  uiStore.addNotification({
-    type: 'info',
-    message: 'Funcionalidade de edição será implementada em breve',
-    duration: 3000
-  })
+  // Carregar tarefa para edição
+  const success = taskStore.loadTaskForEditing(task.id)
+  
+  if (success) {
+    uiStore.addNotification({
+      type: 'info',
+      message: `Editando tarefa: ${task.nome}`,
+      duration: 3000
+    })
+    
+    // Emitir evento para abrir formulário de edição
+    // O componente pai deve escutar este evento
+    emit('edit', task)
+  } else {
+    uiStore.addNotification({
+      type: 'error',
+      message: 'Erro ao carregar tarefa para edição',
+      duration: 5000
+    })
+  }
 }
 
 async function deleteTask(taskId: string) {

@@ -245,10 +245,17 @@
     </div>
 
     <div class="flex justify-between">
-      <Button type="button" variant="outline" @click="handleReset">
-        Limpar Formulário
+      <div class="flex gap-2">
+        <Button type="button" variant="outline" @click="handleReset">
+          {{ isEditing ? 'Cancelar Edição' : 'Limpar Formulário' }}
+        </Button>
+        <Button v-if="isEditing" type="button" variant="outline" @click="handleCancel">
+          Voltar para Criação
+        </Button>
+      </div>
+      <Button type="submit" :loading="isSubmitting">
+        {{ isEditing ? 'Atualizar Tarefa' : 'Criar Tarefa' }}
       </Button>
-      <Button type="submit" :loading="isSubmitting"> Criar Tarefa </Button>
     </div>
   </form>
 </template>
@@ -268,12 +275,16 @@ import type { TaskStatus } from '@/types/task'
 const emit = defineEmits<{
   cancel: []
   created: [task: any]
+  updated: [task: any]
 }>()
 
 const taskStore = useTaskStore()
 const uiStore = useUIStore()
 
 const isSubmitting = ref(false)
+
+// Computed properties para estado de edição
+const isEditing = computed(() => taskStore.isEditing)
 
 const dataFimCalculada = computed(() => {
   if (
@@ -291,6 +302,10 @@ const dataFimCalculada = computed(() => {
 
 function handleReset() {
   taskStore.resetForm()
+}
+
+function handleCancel() {
+  taskStore.cancelEditing()
 }
 
 async function handleSubmit() {
@@ -313,11 +328,17 @@ async function handleSubmit() {
 
     uiStore.addNotification({
       type: 'success',
-      message: `Tarefa "${task.nome}" criada com sucesso!`,
+      message: isEditing.value 
+        ? `Tarefa "${task.nome}" atualizada com sucesso!`
+        : `Tarefa "${task.nome}" criada com sucesso!`,
       duration: 5000,
     })
 
-    emit('created', task)
+    if (isEditing.value) {
+      emit('updated', task)
+    } else {
+      emit('created', task)
+    }
   } catch (error) {
     console.error('Erro ao criar tarefa:', error)
 

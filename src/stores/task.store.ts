@@ -1,3 +1,5 @@
+
+
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import type { Task, TaskCreateInput, TaskUpdateInput, TaskStatus, Role } from '@/types/task'
@@ -29,6 +31,10 @@ export const useTaskStore = defineStore('task', () => {
     urgente: false,
     paralelo: false
   })
+
+  // Estado para edição
+  const isEditing = ref(false)
+  const editingTaskId = ref<string | null>(null)
 
   // Getters
   const byResponsavel = computed(() => {
@@ -126,6 +132,37 @@ export const useTaskStore = defineStore('task', () => {
       urgente: false,
       paralelo: false
     }
+    
+    // Reset do estado de edição
+    isEditing.value = false
+    editingTaskId.value = null
+  }
+
+  function loadTaskForEditing(taskId: string) {
+    const task = tasks.value.find(t => t.id === taskId)
+    if (!task) return false
+
+    // Preencher formulário com dados da tarefa
+    formData.value = {
+      nome: task.nome,
+      link: task.link || '',
+      dataInicio: task.dataInicio,
+      prazoDias: task.prazoDias,
+      responsavel: task.responsavel,
+      gerente: task.gerente,
+      status: task.status,
+      prioridade: task.prioridade,
+      urgente: task.urgente || false,
+      paralelo: task.paralelo || false
+    }
+
+    isEditing.value = true
+    editingTaskId.value = taskId
+    return true
+  }
+
+  function cancelEditing() {
+    resetForm()
   }
 
   async function submitForm(): Promise<Task | null> {
@@ -147,7 +184,7 @@ export const useTaskStore = defineStore('task', () => {
     }
 
     try {
-      // Criar tarefa usando os dados do formulário
+      // Preparar dados da tarefa
       const taskData = {
         ...formData.value,
         nome: formData.value.nome.trim(),
@@ -157,7 +194,15 @@ export const useTaskStore = defineStore('task', () => {
         prioridade: formData.value.prioridade ? Number(formData.value.prioridade) : undefined
       }
 
-      const task = await createTask(taskData)
+      let task: Task | null = null
+
+      if (isEditing.value && editingTaskId.value) {
+        // Modo edição - atualizar tarefa existente
+        task = await updateTask(editingTaskId.value, taskData)
+      } else {
+        // Modo criação - criar nova tarefa
+        task = await createTask(taskData)
+      }
       
       // Reset do formulário após sucesso
       resetForm()
@@ -551,6 +596,8 @@ export const useTaskStore = defineStore('task', () => {
     isLoading: readonly(isLoading),
     error: readonly(error),
     formData: readonly(formData),
+    isEditing: readonly(isEditing),
+    editingTaskId: readonly(editingTaskId),
     
     // Getters
     byResponsavel,
@@ -569,6 +616,8 @@ export const useTaskStore = defineStore('task', () => {
     updateFormField,
     resetForm,
     submitForm,
+    loadTaskForEditing,
+    cancelEditing,
     addLog
   }
 })
